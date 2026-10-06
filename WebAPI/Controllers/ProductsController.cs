@@ -13,7 +13,6 @@ namespace WebAPI.Controllers
     public class ProductsController : ControllerBase
     {
         IProductService _productService;
-
         public ProductsController(IProductService productService)
         {
             _productService = productService;

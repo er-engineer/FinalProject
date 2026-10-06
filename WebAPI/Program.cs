@@ -1,4 +1,8 @@
 
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using Business.DependencyResolvers.Autofac;
+
 namespace WebAPI
 {
     public class Program
@@ -6,16 +10,19 @@ namespace WebAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
-            // Use classic Startup pattern to register services.
-            var startup = new Startup(builder.Configuration);
-            startup.ConfigureServices(builder.Services);
-
+            builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
+            builder.Host.ConfigureContainer<ContainerBuilder>(containerBuilder =>
+            {
+                containerBuilder.RegisterModule(new AutofacBusinessModule());
+            });
+            builder.Services.AddControllers();
             var app = builder.Build();
-
-            // Configure middleware/pipeline using Startup
-            startup.Configure(app, app.Environment);
-
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            app.UseRouting();
+            app.MapControllers();
             app.Run();
         }
     }
