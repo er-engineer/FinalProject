@@ -9,7 +9,13 @@ using System.Text;
 namespace DataAccess.Concrete.EntityFramework
 {
     public class EfCategoryDal : EfEntityRepositoryBase<Category, NorthwindContext>, ICategoryDal
-    { 
-
+    {
+        public int Count()
+        {
+            using (NorthwindContext context = new NorthwindContext())
+            {
+                return context.Categories.Count();
+            }
+        }
     }
 }
