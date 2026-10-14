@@ -2,6 +2,12 @@
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Business.DependencyResolvers.Autofac;
+using Core.DependencyResolvers;
+using Core.Extensions;
+using Core.Utilities.IoC;
+using Core.Utilities.Security.Encryption;
+using Core.Utilities.Security.JWT;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace WebAPI
 {
@@ -16,13 +22,38 @@ namespace WebAPI
                 containerBuilder.RegisterModule(new AutofacBusinessModule());
             });
             builder.Services.AddControllers();
+            var tokenOptions = builder.Configuration.GetSection("TokenOptions").Get<TokenOptions>();
+            builder.Services.AddDependencyResolvers(new ICoreModule[] {
+                new CoreModule()});
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = tokenOptions.Issuer,
+                        ValidAudience = tokenOptions.Audience,
+                        IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey)
+                    };
+                });
             var app = builder.Build();
             if (app.Environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseHttpsRedirection();
+
             app.UseRouting();
+
+            app.UseAuthentication();
+
+            app.UseAuthorization();
+
             app.MapControllers();
+
             app.Run();
         }
     }
