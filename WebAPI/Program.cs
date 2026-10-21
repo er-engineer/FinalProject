@@ -44,6 +44,13 @@ namespace WebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+            app.UseCors(options =>
+            {
+                options.AllowAnyHeader()
+                .AllowAnyOrigin()
+                .AllowAnyHeader();
+            });
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
