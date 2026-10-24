@@ -22,7 +22,7 @@ namespace WebAPI.Controllers
         public IActionResult GetAll()
         {
             //Simulating delay
-            Thread.Sleep(2000);
+            Thread.Sleep(500);
 
            var result = _productService.GetAll();
            if(result.Success)
