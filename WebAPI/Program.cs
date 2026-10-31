@@ -44,6 +44,9 @@ namespace WebAPI
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.ConfigureCustomExceptionMiddleware();
+
             app.UseCors(options =>
             {
                 options.AllowAnyHeader()
